@@ -1,4 +1,4 @@
-console.log("sprint 2 rappi");
+console.log("sprint 3 rappi");
 
 const data = {
   //currentDate fecha actual
@@ -198,27 +198,61 @@ const data = {
   ],
 };
 
-function printEventNames(data) {
+// function printEventHome(data) {
 
-  const eventsLength = data.events.length;
+//   const eventsLength = data.events.length;
+
+//   let container = document.getElementById('container');
+//   for (let i = 0; i < eventsLength; i++) {
+//     const event = data.events[i];
+//     console.log(event.name);
+
+//     let tarjeta = document.createElement('div');
+//     tarjeta.className = 'card'
+//     tarjeta.innerHTML = `
+//         <img src="${event.image}" class="card-img-top" alt="...">
+//           <div class="card-body">
+//             <h5 class="card-title">${event.name}</h5>
+//             <p class="card-text">${event.description}</p>
+//           </div>
+//             <div class="d-flex justify-content-around  mb-2 final align-items-center">
+//               <p class="m-1 fs-3">$${event.price}</p>
+//                <a href="./pages/details.html" class="btn btn-primary">Details</a>
+//           </div>
+//       `
+//     container.appendChild(tarjeta)
+//   }
+
+// }
+// // llama a la funcion con el objeto data que vamos a recorrer para pintar nuestras cards
+// printEventHome(data)
+
+
+// ***** Sprint 3 ******
+
+// quite el renplace
+
+function pintarCards(arregloEvents){
+  const eventsLength = arregloEvents.length;
 
   let container = document.getElementById('container');
-
+   // para que quede limpio cada vez que se pintern las tarjetas y muestre solo las que cumplen con la condicion del filto search.
+  container.innerHTML = ""
   for (let i = 0; i < eventsLength; i++) {
     const event = data.events[i];
-    console.log(event.name);
+    //console.log(event.name);
 
     let tarjeta = document.createElement('div');
     tarjeta.className = 'card'
     tarjeta.innerHTML = `
-        <img src="${event.image}" class="card-img-top" alt="...">
+        <img src="${arregloEvents[i].image}" class="card-img-top" alt="...">
           <div class="card-body">
-            <h5 class="card-title">${event.name}</h5>
-            <p class="card-text">${event.description}</p>
+            <h5 class="card-title">${arregloEvents[i].name}</h5>
+            <p class="card-text">${arregloEvents[i].description}</p>
           </div>
             <div class="d-flex justify-content-around  mb-2 final align-items-center">
-              <p class="m-1 fs-3">${event.price}</p>
-               <a href="./pages/details.html" class="btn btn-primary">Details</a>
+              <p class="m-1 fs-3">$${arregloEvents[i].price}</p>
+               <a href="./pages/details.html?id=${arregloEvents[i]._id}" class="btn btn-primary">Details</a>
           </div>
       `
     container.appendChild(tarjeta)
@@ -226,5 +260,164 @@ function printEventNames(data) {
 
 }
 
-// Call the function with the data object
-printEventNames(data)
+// Nueva funcion que pinta las cards
+pintarCards(data.events)
+
+function checkboxDinamicos(ArrayCategorias){
+  for (let i = 0; i < ArrayCategorias.length; i++) {
+    //creo un nuevo checkbox a traves del dom
+    let newChecbox = document.createElement('div')
+    //Agrego las clases de boostrap a mis div que se van generando dimnamicamente, con .className
+    newChecbox.className = "form-check form-check-inline"
+    // Agrego la informacion a mis nuevos chechbox con la propiedad innerHTML
+    newChecbox.innerHTML = `
+      <input class="form-check-input" type="checkbox" id="${ArrayCategorias[i].replace(" ","-")}" value="${ArrayCategorias[i]}">
+      <label class="form-check-label" for="${ArrayCategorias[i].replace(" ","-")}">${ArrayCategorias[i]}</label>
+    `
+    // Agrego los elementos creados a mi coontenedor principal (section con la class = "check")con appedChild
+    document.getElementById('check').appendChild(newChecbox)
+    
+  }
+}
+
+//map me crea un nuevo array ,para pasar como parametro de mi funcion un array con las categorias que mi funcion checkboxDinamicos necesita para recorrer y pintar mis checkbox dinamicos.
+let categoriasEventos = data.events.map( evento => evento.category)
+
+/*console.log(categoriasEventos);//me devuelve todas las categorias que encontro pero estan duplicadas.
+// con set quitamos los elementos duplicados de un array */
+
+/*let categoriasUnicas = new Set(categoriasEventos) 
+console.log(categoriasUnicas);// me devuelve un set de las categorias pero debo combertirlo en un arreglo con Array.form()
+ let categoriaUnica = Array.from(categoriasUnicas)
+ console.log(categoriaUnica);*/
+
+ let categoriaUnica = [...new Set(categoriasEventos)]
+ //console.log(categoriaUnica);
+ // Llama a la funcion con el arreglo que vamos a recorrer
+
+
+
+
+
+
+
+
+
+//********** FILTROS  ***********/
+
+
+//__________FILTRO TEXTO___________ /
+
+// function filtroSearch(arregloEvents){
+//   let texto = document.getElementById('searchText').value.toLowerCase()
+//   let arregloFiltro = arregloEvents.filter(evento => evento.name.toLowerCase().includes(texto) || evento.description.toLowerCase().includes(texto) )
+//   return arregloFiltro;
+// }
+
+
+function filtroSearch(arregloEvents){
+  let texto = document.getElementById('searchText').value.toLowerCase()
+  let arregloFiltro = arregloEvents
+    if (texto != null || texto != undefined) {
+      arregloFiltro = arregloEvents.filter(evento => evento.name.toLowerCase().includes(texto) || evento.description.toLowerCase().includes(texto) )
+    }
+   
+  return arregloFiltro;
+}
+
+
+
+/*
+document.getElementById('searchText').addEventListener('keyup', ()=>{
+  let arregloFiltradoTexto = filtroSearch(data.events)
+ // let arregloFiltradoChecks = filtroChecks(arregloFiltradoTexto)
+ //console.log(arregloFiltradoTexto);
+  pintarCards(arregloFiltradoTexto)
+
+} )
+*/
+
+
+//__________FILTRO CHECKBOXS___________ /
+
+// function filtroChecks(arregloEvents){
+//   let checkboxCheckeados = [...document.querySelectorAll('input[type=checkbox]:checked')]
+//   checkboxCheckeados = checkboxCheckeados.map(e => e.value)
+//   let arregloFiltro = arregloEvents.filter(evento => checkboxCheckeados.includes(evento.category))
+//   return arregloFiltro
+// }
+
+function filtroChecks(arregloEvents){
+  let checkboxCheckeados = [...document.querySelectorAll('input[type=checkbox]:checked')]
+  checkboxCheckeados = checkboxCheckeados.map(e => e.value)
+let arregloFiltro = arregloEvents
+  if(checkboxCheckeados.length != 0){
+    arregloFiltro = arregloEvents.filter(evento => checkboxCheckeados.includes(evento.category))
+  }
+  return arregloFiltro
+}
+
+
+/*
+document.getElementById('check').addEventListener('change', () => { 
+  let arregloFiltradoChecks = filtroChecks(data.events)
+ // let arregloFiltradoText = filtroSearch(arregloFiltradoChecks)
+  //console.log(arregloFiltradoChecks);
+  pintarCards(arregloFiltradoChecks)
+})
+*/
+
+//______FILTROS CRUZADOS_______/
+
+document.getElementById('searchText').addEventListener('keyup', ()=>{
+  let arregloFiltradoTexto = filtroSearch(data.events)
+  let arregloFiltradoChecks = filtroChecks(arregloFiltradoTexto)
+    
+  //pintarCards(arregloFiltradoChecks)
+
+  if (arregloFiltradoChecks.length != 0) {
+    pintarCards(arregloFiltradoChecks)
+  }else{
+    document.getElementById('container').innerHTML=`
+    <div class="error">
+      <div class="textError">
+        <h2>no hay resultados</h2>
+        <h4>Vuelve a intentar</h4>
+      </div>
+      <div class="oops">
+        <img src="../img/oops.png" alt="error">
+      </div>
+    </div>`
+  }
+
+} )
+
+document.getElementById('check').addEventListener('change', () => { 
+  let arregloFiltradoChecks = filtroChecks(data.events)
+  let arregloFiltradoTexto = filtroSearch(arregloFiltradoChecks)
+  //pintarCards(arregloFiltradoTexto)
+
+  if (arregloFiltradoTexto.length != 0) {
+    pintarCards(arregloFiltradoTexto)
+  }else{
+    document.getElementById('container').innerHTML=`
+    <div class="error">
+      <div class="textError">
+        <h2>no hay resultados</h2>
+        <h4>Vuelve a intentar</h4>
+      </div>
+      <div class="oops">
+        <img src="../img/oops.png" alt="error">
+      </div>
+    </div>`
+  }
+
+})
+
+//______FILTROS CRUZADOS CON IFS_______/
+
+checkboxDinamicos(categoriaUnica)
+filtroSearch(data.events)
+filtroChecks(data.events)
+
+

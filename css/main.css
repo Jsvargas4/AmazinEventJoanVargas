@@ -75,3 +75,32 @@ footer img{
 span{
     color: #d90368;
 }
+
+.error{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #d90368;
+    padding: 2rem;
+}
+
+.textError h2{
+    color: aliceblue;
+    font-size: 3rem;
+    text-shadow: -3px 3px 0px rgba(0,0,0,0.53);
+}
+
+.textError h4{
+    color: rgb(243, 247, 31);
+    text-shadow: -3px 3px 0px rgba(0,0,0,0.53);
+}
+
+
+
+.oops{
+    width: 50%;
+}
+.error img{
+    width: 100%;
+}

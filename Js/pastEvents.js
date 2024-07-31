@@ -196,6 +196,8 @@ const data = {
   ],
 };
 
+//funcion para pintar las cards que cumplan con la condicion en la que la fecha de los eventos es menor a la courrentDate(fecha actual).
+/*
 function pastEvents(data) {
 
   const eventsLength = data.events.length;
@@ -208,8 +210,6 @@ function pastEvents(data) {
 
     if (data.events[i].date < data.currentDate) {
 
-
-
       let tarjeta = document.createElement('div');
       tarjeta.className = 'card'
       tarjeta.innerHTML = `
@@ -219,8 +219,8 @@ function pastEvents(data) {
             <p class="card-text">${event.description}</p>
           </div>
             <div class="d-flex justify-content-around  mb-2 final align-items-center">
-              <p class="m-1 fs-3">${event.price}</p>
-               <a href="./pages/details.html" class="btn btn-primary">Details</a>
+              <p class="m-1 fs-3">$${event.price}</p>
+               <a href="../pages/details.html" class="btn btn-primary">Details</a>
           </div>
       `
       container.appendChild(tarjeta)
@@ -229,3 +229,137 @@ function pastEvents(data) {
 }
 
 pastEvents(data)
+*/
+
+
+// ***** SPRINT 3 ******
+
+//______NUEVA FUNCION PARA PINTAR LAS CARDS DE PAST EVENTS_______/
+
+//FILTRAR LOS EVENTOS PASADOOS
+ let arregloPastEvents = data.events.filter( evento => evento.date < data.currentDate)
+console.log(arregloPastEvents);
+
+ function pintarCards(arregloEvents){
+  const eventsLength = arregloEvents.length;
+
+  let container = document.getElementById('pastEvents');
+   // para que quede limpio cada vez que se pintern las tarjetas y muestre solo las que cumplen con la condicion del filto search.
+  container.innerHTML = ""
+  for (let i = 0; i < eventsLength; i++) {
+    const event = data.events[i];
+    //console.log(event.name);
+
+    let tarjeta = document.createElement('div');
+    tarjeta.className = 'card'
+    tarjeta.innerHTML = `
+        <img src="${arregloEvents[i].image}" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">${arregloEvents[i].name}</h5>
+            <p class="card-text">${arregloEvents[i].description}</p>
+          </div>
+            <div class="d-flex justify-content-around  mb-2 final align-items-center">
+              <p class="m-1 fs-3">$${arregloEvents[i].price}</p>
+               <a href="../pages/details.html?id=${arregloEvents[i]._id}" class="btn btn-primary">Details</a>
+          </div>
+      `
+    container.appendChild(tarjeta)
+  }
+
+}
+// Nueva funcion que pinta las cards
+pintarCards(arregloPastEvents)
+
+
+//__________FILTRO TEXTO___________ /
+
+filtroSearch(arregloPastEvents)
+
+function filtroSearch(arregloEvents){
+  let texto = document.getElementById('searchTextPast').value.toLowerCase()
+  let arregloFiltro = arregloEvents
+    if (texto != null || texto != undefined) {
+      arregloFiltro = arregloEvents.filter(evento => evento.name.toLowerCase().includes(texto) || evento.description.toLowerCase().includes(texto) )
+    }
+  return arregloFiltro;
+}
+
+document.getElementById('searchTextPast').addEventListener('keyup', e => {
+  let arregloFiltrado =filtroSearch(arregloPastEvents)
+  let arregloFiltradoChecks= filtroChecks(arregloFiltrado)
+  if (arregloFiltradoChecks.length != 0) {
+    pintarCards(arregloFiltradoChecks)   
+  }else{
+    document.getElementById('pastEvents').innerHTML= ` 
+    <div class="error">
+      <div class="textError">
+        <h2>no hay resultados</h2>
+        <h4>Vuelve a intentar</h4>
+      </div>
+      <div class="oops">
+        <img src="../img/oops.png" alt="error">
+      </div>
+    </div>`
+  }
+})
+
+
+//__________FILTRO CHECKBOXS___________ /
+
+
+function filtroChecks(arregloEvents){
+  let checkboxCheckeados = [...document.querySelectorAll('input[type=checkbox]:checked')]
+  checkboxCheckeados = checkboxCheckeados.map(e => e.value)
+    let arregloFiltra = arregloEvents
+    if(checkboxCheckeados.length != 0){
+      arregloFiltra = arregloEvents.filter(evento => checkboxCheckeados.includes(evento.category))
+    }
+  return arregloFiltra
+}
+
+document.getElementById('check').addEventListener('change', e => { 
+  let arregloFiltradoChecks= filtroChecks(arregloPastEvents)
+  let arregloFiltrado =filtroSearch(arregloFiltradoChecks)
+  if (arregloFiltrado.length != 0) {
+    pintarCards(arregloFiltrado)   
+  }else{
+    document.getElementById('pastEvents').innerHTML= `
+    <div class="error">
+      <div class="textError">
+        <h2>no hay resultados</h2>
+        <h4>Vuelve a intentar</h4>
+      </div>
+      <div class="oops">
+        <img src="../img/oops.png" alt="error">
+      </div>
+    </div>`
+  }
+})
+
+
+function checkboxDinamicos(ArrayCategorias){
+  for (let i = 0; i < ArrayCategorias.length; i++) {
+    //creo un nuevo checkbox a traves del dom
+    let newChecbox = document.createElement('div')
+    //Agrego las clases de boostrap a mis div que se van generando dimnamicamente, con .className
+    newChecbox.className = "form-check form-check-inline"
+    // Agrego la informacion a mis nuevos chechbox con la propiedad innerHTML
+    newChecbox.innerHTML = `
+      <input class="form-check-input" type="checkbox" id="${ArrayCategorias[i].replace(" ","-")}" value="${ArrayCategorias[i]}">
+      <label class="form-check-label" for="${ArrayCategorias[i].replace(" ","-")}">${ArrayCategorias[i]}</label>
+    `
+    // Agrego los elementos creados a mi coontenedor principal (section con la class = "check")con appedChild
+    document.getElementById('check').appendChild(newChecbox)
+    
+  }
+}
+
+let categoriasEventos = data.events.map( evento => evento.category)//me devuelve todas las categorias que encontro pero estan duplicadas
+let categoriasUnicas = new Set(categoriasEventos) // me devuelve un set de las categorias pero debo combertirlo en un arreglo con Array.form()
+let categoriaUnica = Array.from(categoriasUnicas)
+
+
+// Llama a la funcion con el arreglo que vamos a recorrer
+checkboxDinamicos(categoriaUnica)
+filtroChecks(arregloPastEvents)
+filtroSearch(arregloPastEvents)
